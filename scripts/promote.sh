@@ -47,12 +47,14 @@ echo "== 2. что уедет в прод =="
 git log --oneline prod/main..origin/main | sed 's/^/   /'
 git diff --stat prod/main origin/main | sed 's/^/   /'
 
+# важно: запоминаем список ДО отправки — после неё прод уже равен тесту
+mapfile -t CHANGED < <(git diff --name-only prod/main origin/main | grep -v '^$')
+
 echo "== 3. переношу в прод =="
 git push -q prod origin/main:main
 echo "   отправлено"
 
 echo "== 4. жду публикацию и сверяю содержимое с тестом =="
-mapfile -t CHANGED < <(git diff --name-only prod/main origin/main | grep -v '^$')
 verify_published "$PROD_URL" "${CHANGED[@]}" || true
 
 echo
