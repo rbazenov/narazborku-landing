@@ -2922,8 +2922,8 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   const HEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
   const safeText = (v, max) => esc(String(v).replace(/[\r\n\t]+/g, ' ').trim()).slice(0, max);
   const safeUrl = (v, max) => {                       // ссылки без кавычек и угловых скобок
-    const s = String(v).trim().replace(/["'<>\s]/g, '');
-    return /^(https?:\/\/|\/|data:image\/)/i.test(s) ? s.slice(0, max) : '';
+    const t = String(v).trim().replace(/["'<>\s]/g, '');
+    return /^(https?:\/\/|\/|data:image\/)/i.test(t) ? t.slice(0, max) : '';
   };
   /* «ссылка» кнопки баннера: #якорь | https://адрес | категория:Освещение | поиск:аккумулятор */
   function parseBannerLink(link, fallback) {
@@ -2935,7 +2935,25 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     if (m) return m[1].toLowerCase() === 'категория' ? { cat: safeText(m[2], 60) } : { q: safeText(m[2], 60) };
     return { q: safeText(v, 60) };
   }
-  /* превращает список из админки в слайды; некорректные поля берём из значений по умолчанию */
+  /* ---------- разбор списка баннеров из текста админки ----------
+     Каждый баннер — одна строка вида
+       Баннер: Заголовок | Текст | Кнопка | Ссылка | Значок | Картинка | #цвет1, #цвет2
+     Пустые части и лишние строки не ломают страницу: подставляется исходное значение. */
+  function parseBannersFromText(text) {
+    var out = [];
+    String(text || '').split(/\r?\n/).forEach(function (line) {
+      var m = line.match(/^\s*баннер(\s*\d+)?\s*:\s*(.+)$/i);
+      if (!m) return;
+      var parts = m[2].split('|').map(function (x) { return x.replace(/[\u00A0\u2007\u202F]/g, ' ').trim(); });
+      if (!parts.length || !parts[0]) return;
+      out.push({
+        title: parts[0], text: parts[1] || '', button: parts[2] || '',
+        link: parts[3] || '', icon: parts[4] || '', image: parts[5] || '', colors: parts[6] || ''
+      });
+    });
+    return out.length ? out : null;
+  }
+  /* превращает список из админки в слайды; пустые поля берутся из значений по умолчанию */
   function normalizeBanners(list) {
     if (!Array.isArray(list) || !list.length) return null;
     return list.slice(0, 6).map((raw, i) => {
@@ -2946,15 +2964,20 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
       if (r.text) b.p = safeText(r.text, 180);
       if (r.button) b.c = safeText(r.button, 40);
       if (r.icon) b.e = safeText(r.icon, 8);
-      if (r.image) b.img = safeUrl(r.image, 400);
+      if (r.image) { b.img = safeUrl(r.image, 400); b.e = ''; }
       if (typeof r.gradient === 'string' && r.gradient.trim()) b.g = r.gradient.trim().slice(0, 200);
       else if (Array.isArray(r.colors) && r.colors.length >= 2 && HEX.test(String(r.colors[0]).trim()) && HEX.test(String(r.colors[1]).trim()))
         b.g = `linear-gradient(105deg, ${String(r.colors[0]).trim()} 0%, ${String(r.colors[1]).trim()} 100%)`;
+      else if (typeof r.colors === 'string' && r.colors.trim()) {
+        const picked = (r.colors.match(/#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})/g) || []).slice(0, 2);
+        if (picked.length === 2) b.g = `linear-gradient(105deg, ${picked[0]} 0%, ${picked[1]} 100%)`;
+      }
       b.act = parseBannerLink(r.link, def.act);
       return b;
     });
   }
   window.NRBanners = {
+    fromText: parseBannersFromText,
     apply(list) {
       const fixed = normalizeBanners(list);
       if (!fixed) return false;
@@ -4663,16 +4686,18 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
                         total: applied.total, via: res.base,
                         base: res.base, key: SHOP_KEY, region_id: res.region.id,
                         currency_code: res.region.currency_code, variants: variants };
-      /* баннеры и тексты — на служебной странице магазина (адрес landing-content) */
-      getJSON(res.base + '/store/products?handle=landing-content&fields=handle,metadata&limit=1')
+      /* баннеры: сначала из текста админки, затем из Metadata, иначе встроенные */
+      getJSON(res.base + '/store/products?handle=landing-content&fields=handle,description,metadata&limit=1')
         .then(function (d) {
-          var page = (d.products || [])[0];
-          var meta = (page && page.metadata) || {};
-          window.NRContent = { banners: meta.banners || null, text: meta };
-          if (meta.banners && window.NRBanners && window.NRBanners.apply(meta.banners))
-            console.log('[магазин] баннеры взяты из админки: ' + meta.banners.length);
+          var page = (d.products || [])[0] || {};
+          var meta = page.metadata || {};
+          var fromText = window.NRBanners ? window.NRBanners.fromText(page.description || '') : null;
+          var list = (fromText && fromText.length) ? fromText : (meta.banners || null);
+          window.NRContent = { banners: list, source: (fromText && fromText.length) ? 'текст' : (meta.banners ? 'metadata' : 'встроенные') };
+          if (list && window.NRBanners && window.NRBanners.apply(list))
+            console.log('[магазин] баннеры из админки: ' + list.length + ' (' + window.NRContent.source + ')');
         })
-        .catch(function () { window.NRContent = { banners: null, text: {} }; });
+        .catch(function () { window.NRContent = { banners: null, source: 'недоступно' }; });
       say(applied.updated ? 'цены и наличие из админки' : 'подборка недели',
           'позиций из магазина: ' + applied.updated + ', добавлено новых: ' + applied.added);
       console.log('[магазин] синхронизация через ' + res.base + ': обновлено ' + applied.updated +
