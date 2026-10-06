@@ -1529,6 +1529,83 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   .assistant-panel:not([hidden]) { animation: none !important; }
 }
 </style>
+<style id="sellerChatStyles">
+/* ---------- «Написать продавцу»: кнопка в карточке товара ---------- */
+.p-sell { width: 100%; min-height: 34px; margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 4px;
+          border: 1px solid var(--border); border-radius: 9px; background: var(--gray); color: var(--dark);
+          font-size: 10.5px; font-weight: 700; transition: transform .12s, background .2s, border-color .2s; }
+.p-sell:hover { background: var(--surface); border-color: #cfd3dd; }
+.p-sell:active { transform: scale(.97); }
+.p-sell:focus-visible { outline: 3px solid var(--gold-txt); outline-offset: 2px; }
+
+/* ---------- та же кнопка на странице товара ---------- */
+.pp-sell { width: 100%; min-height: 56px; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;
+           border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--dark);
+           font-size: 14px; font-weight: 800; transition: background .15s, border-color .15s; }
+.pp-sell:hover { background: var(--gray); border-color: #cfd3dd; }
+.pp-sell:active { transform: scale(.99); }
+.pp-sell:focus-visible { outline: 3px solid var(--gold-txt); outline-offset: 2px; }
+
+/* ---------- окно чата с продавцом ---------- */
+.sc-panel { position: fixed; right: 18px; bottom: 18px; z-index: 1200; width: min(380px, calc(100vw - 24px)); height: min(540px, calc(100vh - 90px));
+            display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(16,18,24,.28); overflow: hidden; }
+.sc-panel[hidden] { display: none; }
+.sc-bar { position: fixed; right: 18px; bottom: 18px; z-index: 1200; display: flex; align-items: center; gap: 10px; max-width: min(360px, calc(100vw - 24px));
+          padding: 10px 12px; background: var(--dark); color: var(--warm); border-radius: 14px; box-shadow: 0 14px 34px rgba(16,18,24,.3); }
+.sc-bar[hidden] { display: none; }
+.sc-bar b { font-size: 13px; font-weight: 700; max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-bar .sc-badge { background: var(--amber); color: var(--dark); border-radius: 999px; font-size: 11px; font-weight: 800; padding: 1px 7px; }
+.sc-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); background: var(--gray); }
+.sc-ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 19px; background: var(--surface); border: 1px solid var(--border); flex: none; }
+.sc-t { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+.sc-t b { font-size: 13.5px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-t small { font-size: 11.5px; color: var(--text2); }
+.sc-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--dark);
+          font-size: 15px; line-height: 1; display: grid; place-items: center; flex: none; }
+.sc-btn:hover { background: var(--gray); }
+.sc-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #FBFBFC; }
+.sc-msg { max-width: 84%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; background: var(--surface);
+          border: 1px solid var(--border); align-self: flex-start; word-break: break-word; }
+.sc-msg.mine { align-self: flex-end; background: var(--dark); color: var(--warm); border-color: var(--dark); }
+.sc-msg.mine .bub-tag { color: var(--warm); opacity: .75; }
+.sc-msg.sys { align-self: center; background: transparent; border: 0; color: var(--text2); font-size: 12px; text-align: center; max-width: 100%; }
+.sc-msg .bub-tag { display: block; font-size: 10.5px; font-weight: 800; opacity: .75; margin-bottom: 2px; }
+.sc-form { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--border); background: var(--surface); }
+.sc-form input { flex: 1; min-width: 0; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font: inherit; font-size: 13.5px; background: var(--gray); }
+.sc-form button { flex: none; width: 42px; height: 42px; border-radius: 10px; background: var(--dark); color: var(--warm); font-size: 16px; }
+.sc-note { margin: 0; padding: 8px 12px 10px; font-size: 11px; color: var(--text2); background: var(--surface); border-top: 1px solid var(--border); }
+@media (max-width: 560px) {
+  .sc-panel { right: 8px; left: 8px; bottom: 8px; width: auto; height: min(72vh, 520px); }
+  .sc-bar { right: 8px; left: 8px; bottom: 8px; max-width: none; }
+}
+
+/* ---------- меню «⋯» у диалога в кабинете ---------- */
+#accountApp .conv-side { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex: none; }
+#accountApp .conv-more { width: 26px; height: 20px; display: grid; place-items: center; border: 1px solid var(--border); border-radius: 7px;
+                         background: var(--surface); color: var(--text2); font-size: 14px; line-height: 1; cursor: pointer; }
+#accountApp .conv-more:hover { background: var(--gray); color: var(--dark); }
+#accountApp .conv-mark { margin-left: 4px; font-size: 11px; }
+#accountApp .bub-tag { display: block; font-size: 10.5px; font-weight: 800; opacity: .8; margin-bottom: 2px; }
+#accountApp .bub-tag.warn { color: #B42318; }
+.convm-back { position: fixed; inset: 0; z-index: 1300; background: rgba(16,18,24,.45); display: grid; place-items: center; padding: 16px; }
+.convm { width: min(420px, 100%); max-height: 86vh; overflow: auto; background: var(--surface); border-radius: 16px; box-shadow: 0 24px 60px rgba(16,18,24,.32); }
+.convm-h { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.convm-h b { flex: 1; min-width: 0; font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.convm-list { display: flex; flex-direction: column; padding: 6px; }
+.convm-i { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 12px; border-radius: 10px;
+           font-size: 14px; font-weight: 600; color: var(--dark); background: transparent; border: 0; cursor: pointer; }
+.convm-i:hover { background: var(--gray); }
+.convm-i.danger { color: #B42318; }
+.convm-i .ic { width: 22px; text-align: center; font-size: 16px; }
+.convm-form { padding: 6px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.convm-form textarea { width: 100%; min-height: 84px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+                       font: inherit; font-size: 13.5px; background: var(--gray); resize: vertical; }
+.convm-stars { display: flex; gap: 6px; }
+.convm-star { width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); font-size: 17px; color: var(--text2); }
+.convm-star.on { background: #FFF6E2; border-color: var(--amber); color: var(--dark); }
+.convm-actions { display: flex; gap: 8px; justify-content: flex-end; }
+</style>
 </head>
 <body>
 
@@ -2176,6 +2253,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
           <div class="p-cart-control" data-p-cart-control>${productCardCartHTML(it, qtyInCart)}</div>
           <button class="p-fav" aria-label="В избранное" aria-pressed="${inFav}">${inFav ? '❤️' : '🤍'}</button>
         </div>
+        <button class="p-sell" type="button" data-sell data-id="${it.id}" aria-label="Написать продавцу: ${esc(it.title)}">✍️ Написать продавцу</button>
       </div></article>`;
   }
   function render() {
@@ -2545,6 +2623,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
         <div class="pp-cart-control" id="ppCartControl">${productCartControlHTML(qtyInCart)}</div>
         <button class="pp-favbtn" id="ppFav" aria-label="В избранное">${fav.has(it.id) ? '❤️' : '🤍'}</button>
       </div>
+      <button class="pp-sell" type="button" data-sell data-id="${it.id}" aria-label="Написать продавцу: ${esc(it.title)}">✍️ Написать продавцу</button>
       <h2 class="pp-sub">Характеристики</h2>
       <div class="pp-specs" id="ppSpecs"></div>`;
     const w = (idx * 37) % 900 + 100;
@@ -4032,22 +4111,31 @@ function vSearches() {
 function convList(items) {
   return '<div>' + items.map(function (c) {
     var last = c.msgs[c.msgs.length - 1];
-    return '<a class="conv" href="#cabinet/messages/' + c.id + '" aria-label="Открыть диалог: ' + esc(c.title) + (c.unread ? ' (есть новые сообщения)' : '') + '"><span class="conv-pic" aria-hidden="true">' + c.icon + '</span><span><span class="conv-top"><span class="conv-t">' + esc(c.title) + '</span><span class="conv-time">' + rel(c.t) + '</span></span><span class="conv-meta">' + esc(c.who) + ' · ' + esc(c.ref) + '</span><span class="conv-pv' + (c.unread ? ' un' : '') + '">' + (last.f === 'm' ? 'Вы: ' : '') + esc(last.x) + '</span></span>' + (c.unread ? '<span class="dot" role="img" aria-label="Новое сообщение"></span>' : '<span></span>') + '</a>';
+    var marks = (c.important ? '<span class="conv-mark" title="Важный чат" aria-label="Важный чат">⭐</span>' : '') +
+                (c.pinned ? '<span class="conv-mark" title="Закреплённый чат" aria-label="Закреплённый чат">📌</span>' : '');
+    var side = '<span class="conv-side"><span class="conv-time">' + rel(c.t) + '</span>' +
+      '<span class="conv-more" role="button" tabindex="0" data-conv-menu="' + c.id + '" aria-haspopup="dialog" title="Действия с чатом" aria-label="Действия с чатом: ' + esc(c.title) + '">⋯</span></span>';
+    return '<a class="conv" href="#cabinet/messages/' + c.id + '" aria-label="Открыть диалог: ' + esc(c.title) + (c.unread ? ' (есть новые сообщения)' : '') + '"><span class="conv-pic" aria-hidden="true">' + c.icon + '</span><span><span class="conv-top"><span class="conv-t">' + esc(c.title) + marks + '</span>' + side + '</span><span class="conv-meta">' + esc(c.who) + ' · ' + esc(c.ref) + '</span><span class="conv-pv' + (c.unread ? ' un' : '') + '">' + (last.f === 'm' ? 'Вы: ' : '') + esc(last.x) + '</span></span>' + (c.unread ? '<span class="dot" role="img" aria-label="Новое сообщение"></span>' : '<span></span>') + '</a>';
   }).join('') + '</div>';
 }
 function vMessages() {
   var btn = unreadCount() ? '<button class="btn btn-soft sm" type="button" data-act="read-all">' + ic('check') + 'Прочитать все</button>' : '';
-  var list = S.convs.slice().sort(function (a, b) { return b.t - a.t; });
+  var list = sortConvs(S.convs);
   return heading('Сообщения', 'Переписка с продавцами по заказам и подбору запчастей.', btn) + (list.length ? '<section class="panel">' + convList(list) + '</section>' : empty('messages', 'Сообщений пока нет', 'Напишите продавцу из карточки товара или из заказа.', findBtn()));
 }
 function vChat(r) {
   var c = S.convs.filter(function (x) { return x.id === r.id; })[0];
   if (!c) return heading('Диалог не найден', '') + empty('messages', 'Такого диалога нет', 'Возможно, он был удалён.', '<a class="btn btn-soft" href="#cabinet/messages">' + ic('back') + 'К сообщениям</a>');
-  if (c.unread) { c.unread = false; save(); }
+  if (c.unread) {
+    c.unread = false; save();
+    if (c.server && window.NRShopMessages) window.NRShopMessages.act(c.id, { action: 'read' }).catch(function () { });
+  }
   return '<section class="panel"><header class="chat-h"><a class="icon-btn" href="#cabinet/messages" aria-label="Назад к сообщениям">' + ic('back') + '</a><span class="conv-pic" aria-hidden="true">' + c.icon + '</span><span><h1>' + esc(c.title) + '</h1><p>' + esc(c.who) + ' · ' + esc(c.ref) + '</p></span></header>' +
-    '<div class="chat-w" id="chatW" aria-live="polite">' + c.msgs.map(function (m) { return '<div class="bub ' + (m.f === 'm' ? 'mine' : 'sl') + '">' + esc(m.x) + '<time>' + ftime(m.t) + '</time></div>'; }).join('') + '<div class="typing" id="typing" hidden>Продавец печатает…</div></div>' +
-    '<form class="chat-f" id="chatForm" data-id="' + c.id + '"><label class="sr" for="chatIn">Сообщение продавцу</label><input id="chatIn" type="text" autocomplete="off" placeholder="Напишите сообщение…" maxlength="500"><button class="btn btn-dark" type="submit" aria-label="Отправить">' + ic('send') + '</button></form>' +
-    '<p class="note">Демо: ответ продавца подставляется автоматически.</p></section>';
+    '<div class="chat-w" id="chatW" aria-live="polite">' + c.msgs.map(chatBubble).join('') + (c.server ? '' : '<div class="typing" id="typing" hidden>Продавец печатает…</div>') + '</div>' +
+    (c.blocked
+      ? '<p class="note">Чат заблокирован. Разблокировать можно в меню «⋯» рядом с диалогом.</p>'
+      : '<form class="chat-f" id="chatForm" data-id="' + c.id + '"><label class="sr" for="chatIn">Сообщение продавцу</label><input id="chatIn" type="text" autocomplete="off" placeholder="Напишите сообщение…" maxlength="500"><button class="btn btn-dark" type="submit" aria-label="Отправить">' + ic('send') + '</button></form>') +
+    '<p class="note">' + (c.server ? 'Сообщения видит продавец в админке — он ответит здесь и в разделе «Сообщения».' : 'Демо: ответ продавца подставляется автоматически.') + '</p></section>';
 }
 
 function cartRowHTML(it) {
@@ -4178,7 +4266,14 @@ var ACT = {
   'del-car': function (id) { var c = findBy(S.cars, 'id', id); confirmBox('Удалить автомобиль?', c.make + ' ' + c.model + ', VIN ' + c.vin, 'Удалить', function () { S.cars = S.cars.filter(function (x) { return x.id !== id; }); ensureMain(S.cars); save(); rr(); toast('Автомобиль удалён'); }); },
   'clear-searches': function () { confirmBox('Очистить историю поиска?', 'Все сохранённые запросы будут удалены.', 'Очистить', function () { S.searches = []; save(); rr(); toast('История поиска очищена'); }); },
   'del-search': function (id) { S.searches = S.searches.filter(function (s) { return s.id !== id; }); save(); rr(); },
-  'read-all': function () { S.convs.forEach(function (c) { c.unread = false; }); save(); rr(); toast('Все диалоги отмечены прочитанными'); },
+  'read-all': function () {
+    var server = S.convs.filter(function (c) { return c.server; });
+    S.convs.forEach(function (c) { c.unread = false; }); save(); rr();
+    if (server.length && window.NRShopMessages) {
+      server.forEach(function (c) { window.NRShopMessages.act(c.id, { action: 'read' }).catch(function () { }); });
+    }
+    toast('Все диалоги отмечены прочитанными');
+  },
   'unfav': function (id) { var it = byId(id); NR.fav.remove(id); rr(); toast('Убрано из избранного: ' + esc(it.title)); },
   'fav-cart': function (id) { if (NR.cart.qty(id)) { leave(function () { NR.openCart(); }); return; } NR.cart.add(id, 1); syncCardCart(id); toast('Добавлено в корзину: ' + esc(byId(id).title)); },
   'fav-inc': function (id) { if (!NR.cart.change(id, 1)) toast('Максимум 99 шт. одного товара'); syncCardCart(id); var b = $('[data-cart-row="' + id + '"] [data-act="fav-inc"]'); if (b && !b.disabled) b.focus(); },
@@ -4197,6 +4292,148 @@ var ACT = {
   'reset-demo': function () { confirmBox('Сбросить демо-данные?', 'Заказы, гараж, адреса и сообщения вернутся к исходному состоянию. Корзина и избранное на сайте не затрагиваются.', 'Сбросить', function () { S = seed(); ui = freshUi(); save(); render(); toast('Демо-данные восстановлены'); }); },
   'logout': function () { confirmBox('Выйти из кабинета?', 'Чтобы вернуться, понадобится войти снова.', 'Выйти', doLogout); }
 };
+
+/* ---------- сообщения из магазина: настоящие диалоги покупателя ---------- */
+function sortConvs(list) {
+  return list.slice().sort(function (a, b) {
+    if (!!b.pinned !== !!a.pinned) return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+    if (!!b.important !== !!a.important) return (b.important ? 1 : 0) - (a.important ? 1 : 0);
+    return (b.t || 0) - (a.t || 0);
+  });
+}
+function chatBubble(m) {
+  var tag = m.kind === 'review' ? '⭐ Отзыв' + (m.rating ? ' · ' + m.rating + '/5' : '') : m.kind === 'complaint' ? '⚠ Жалоба' : '';
+  return '<div class="bub ' + (m.f === 'm' ? 'mine' : 'sl') + '">' + (tag ? '<span class="bub-tag' + (m.kind === 'complaint' ? ' warn' : '') + '">' + tag + '</span>' : '') + esc(m.x) + '<time>' + ftime(m.t) + '</time></div>';
+}
+function pullServerMessages(silent) {
+  if (!window.NRShopMessages || !window.NRShopMessages.available()) return Promise.resolve(null);
+  return window.NRShopMessages.pull().then(function (list) {
+    if (!silent && list && list.length) toast('Сообщения загружены из магазина');
+    return list;
+  });
+}
+
+/* ---------- меню «⋯» у диалога: отзыв, жалоба, важное, закрепить, удалить ---------- */
+function doConvAct(c, action, payload) {
+  payload = payload || {};
+  var said = {
+    read: 'Чат отмечен прочитанным', important: 'Пометка «важное» обновлена', pin: 'Закрепление обновлено',
+    block: 'Блокировка обновлена', hide: 'Чат удалён',
+    review: 'Спасибо! Отзыв отправлен продавцу', complaint: 'Жалоба отправлена — продавец её увидит'
+  };
+  if (c.server && window.NRShopMessages) {
+    window.NRShopMessages.act(c.id, { action: action, body: payload.body, rating: payload.rating })
+      .then(function () { return window.NRShopMessages.pull(); })
+      .then(function () { if (said[action]) toast(said[action]); if (action === 'hide') go('messages'); })
+      .catch(function (err) { toast('Не получилось: ' + (err && err.message ? err.message : 'магазин недоступен')); });
+    return;
+  }
+  if (action === 'read') c.unread = false;
+  else if (action === 'important') c.important = !c.important;
+  else if (action === 'pin') c.pinned = !c.pinned;
+  else if (action === 'block') c.blocked = !c.blocked;
+  else if (action === 'hide') S.convs = S.convs.filter(function (x) { return x.id !== c.id; });
+  else if (action === 'review' || action === 'complaint') {
+    c.msgs.push({ f: 'm', t: Date.now(), x: payload.body, kind: action, rating: payload.rating });
+    c.t = Date.now(); c.unread = false;
+  }
+  save();
+  if (action === 'hide') go('messages'); else rr();
+  if (said[action]) toast(said[action]);
+}
+function convMenu(id) {
+  var c = findBy(S.convs, 'id', id);
+  if (!c) return;
+  var prev = document.activeElement, root = $('#accModalRoot');
+  var rows = [
+    { k: 'review', ic: '⭐', t: 'Оставить отзыв' },
+    { k: 'block', ic: '🚫', t: c.blocked ? 'Разблокировать' : 'Заблокировать' },
+    { k: 'complaint', ic: '⚠️', t: 'Пожаловаться на объявление' },
+    { k: 'read', ic: '✓', t: 'Отметить чат прочитанным' },
+    { k: 'important', ic: '❗', t: c.important ? 'Снять пометку «важное»' : 'Отметить чат важным' },
+    { k: 'pin', ic: '📌', t: c.pinned ? 'Открепить' : 'Закрепить' },
+    { k: 'delete', ic: '🗑', t: 'Удалить чат' }
+  ];
+  root.innerHTML = '<div class="convm-back" data-cm="back"><div class="convm" role="dialog" aria-modal="true" aria-labelledby="cmTitle">' +
+    '<header class="convm-h"><span class="conv-pic" aria-hidden="true">' + c.icon + '</span><b id="cmTitle">' + esc(c.title) + '</b>' +
+    '<button class="icon-btn" type="button" data-cm="close" aria-label="Закрыть меню">' + ic('x') + '</button></header>' +
+    '<div class="convm-list" id="cmList">' + rows.map(function (r) {
+      return '<button class="convm-i' + (r.k === 'delete' ? ' danger' : '') + '" type="button" role="menuitem" data-cm="' + r.k + '"><span class="ic" aria-hidden="true">' + r.ic + '</span>' + r.t + '</button>';
+    }).join('') + '</div><div class="convm-form" id="cmForm" hidden></div></div></div>';
+
+  function close() {
+    root.innerHTML = ''; root.onclick = null; root.onkeydown = null;
+    document.removeEventListener('keydown', menuKey, true);
+    if (prev && prev.focus && document.contains(prev)) prev.focus();
+  }
+  function menuKey(e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } }
+  function reviewForm(kind) {
+    var form = $('#cmForm', root), list = $('#cmList', root);
+    var rating = kind === 'review' ? 5 : 0;
+    form.innerHTML = (kind === 'review'
+      ? '<div class="convm-stars" id="cmStars" role="group" aria-label="Оценка товара">' + [1, 2, 3, 4, 5].map(function (n) {
+          return '<button class="convm-star on" type="button" data-star="' + n + '" aria-label="Оценка ' + n + ' из 5">★</button>';
+        }).join('') + '</div>'
+      : '') +
+      '<label class="sr" for="cmText">' + (kind === 'review' ? 'Текст отзыва' : 'Текст жалобы') + '</label>' +
+      '<textarea id="cmText" maxlength="600" placeholder="' + (kind === 'review' ? 'Как товар показал себя? Что понравилось?' : 'Что не так с объявлением?') + '"></textarea>' +
+      '<div class="convm-actions"><button class="btn btn-soft" type="button" data-cm="cancel">Отмена</button>' +
+      '<button class="btn btn-dark" type="button" data-cm="send-' + kind + '">' + (kind === 'review' ? 'Отправить отзыв' : 'Отправить жалобу') + '</button></div>';
+    list.hidden = true; form.hidden = false;
+    var stars = $('#cmStars', root);
+    if (stars) stars.onclick = function (e) {
+      var b = e.target.closest('[data-star]'); if (!b) return;
+      rating = +b.dataset.star;
+      $$('[data-star]', stars).forEach(function (s) { if (+s.dataset.star <= rating) s.classList.add('on'); else s.classList.remove('on'); });
+    };
+    var t = $('#cmText', root); if (t) t.focus();
+    return {
+      rating: function () { return rating; },
+      text: function () { var el = $('#cmText', root); return el ? el.value.trim() : ''; }
+    };
+  }
+  var form = null;
+  root.onclick = function (e) {
+    var el = e.target.closest('[data-cm]'); if (!el) return;
+    var k = el.dataset.cm;
+    if (k === 'back' || k === 'close' || k === 'cancel') { close(); return; }
+    if (k === 'review' || k === 'complaint') { form = reviewForm(k); return; }
+    if (k === 'delete') {
+      close();
+      confirmBox('Удалить чат?', '«' + c.title + '» исчезнет из списка сообщений. Вернуть его можно, если написать продавцу снова.', 'Удалить чат', function () {
+        doConvAct(c, 'hide');
+      });
+      return;
+    }
+    if (k === 'send-review' || k === 'send-complaint') {
+      var kind = k === 'send-review' ? 'review' : 'complaint';
+      var text = form ? form.text() : '';
+      if (!text) { toast(kind === 'review' ? 'Напишите пару слов о товаре' : 'Опишите, что не так с объявлением'); return; }
+      var rating = kind === 'review' && form ? form.rating() : undefined;
+      close();
+      doConvAct(c, kind, { body: text, rating: rating });
+      return;
+    }
+    close();
+    doConvAct(c, k);
+  };
+  document.addEventListener('keydown', menuKey, true);
+  var first = $('[data-cm="review"]', root); if (first) first.focus();
+}
+acc.addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('[data-conv-menu]') : null;
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  convMenu(b.getAttribute('data-conv-menu'));
+});
+acc.addEventListener('keydown', function (e) {
+  var b = e.target.closest ? e.target.closest('[data-conv-menu]') : null;
+  if (b && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault(); e.stopPropagation();
+    convMenu(b.getAttribute('data-conv-menu'));
+  }
+});
+
 acc.addEventListener('click', function (e) {
   var b = e.target.closest('[data-act]'); if (!b || !ACT[b.dataset.act]) return;
   e.preventDefault(); ACT[b.dataset.act](b.dataset.id, b);
@@ -4217,7 +4454,16 @@ acc.addEventListener('submit', function (e) {
   var f = e.target, id = f.id, er;
   if (id === 'chatForm') {
     e.preventDefault(); var inp = $('#chatIn'), txt = inp.value.trim(); if (!txt) return;
-    var c = findBy(S.convs, 'id', f.dataset.id); c.msgs.push({ f: 'm', t: Date.now(), x: txt }); c.t = Date.now(); save();
+    var c = findBy(S.convs, 'id', f.dataset.id);
+    if (c && c.server && window.NRShopMessages) {
+      inp.value = '';                                       // сообщение уходит продавцу в магазин
+      window.NRShopMessages.act(c.id, { action: 'send', body: txt })
+        .then(function () { return window.NRShopMessages.pull(); })
+        .then(function () { var w = $('#chatW'); if (w) w.scrollTop = w.scrollHeight; })
+        .catch(function (err) { inp.value = txt; toast('Не отправлено: ' + (err && err.message ? err.message : 'магазин недоступен')); });
+      return;
+    }
+    c.msgs.push({ f: 'm', t: Date.now(), x: txt }); c.t = Date.now(); save();
     var w = $('#chatW'), ty = $('#typing'), d = document.createElement('div');
     d.className = 'bub mine'; d.innerHTML = esc(txt) + '<time>' + ftime(Date.now()) + '</time>'; w.insertBefore(d, ty);
     inp.value = ''; ty.hidden = false; w.scrollTop = w.scrollHeight; inp.focus(); chatReply(c); return;
@@ -4459,6 +4705,12 @@ window.NRAccount = {
     if (!acc.hidden) render();
   },
   serverMode: function () { return !!S.server; },
+  /* ---------- диалоги покупателя из магазина ---------- */
+  applyServerMessages: function (list) {
+    S.convs = (list || []).slice();
+    save();
+    if (!acc.hidden) render();
+  },
   cabinetOpen: function () { return !acc.hidden; },
   openCabinet: function (section) {
     var want = '#cabinet' + (section ? '/' + section : '');
@@ -5033,9 +5285,58 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
     }
   };
 
-  /* при открытии кабинета подтягиваем свежие заказы из магазина */
+  /* ---------- переписка с продавцом ---------- */
+  var CLIENT_KEY = 'nr.shop.client';
+  function clientId() {
+    var id = '';
+    try { id = localStorage.getItem(CLIENT_KEY) || ''; } catch (e) { /* нет сохранения */ }
+    if (!id) {
+      id = 'cl' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+      try { localStorage.setItem(CLIENT_KEY, id); } catch (e) { /* нет сохранения */ }
+    }
+    return id;
+  }
+  function mapConv(c) {
+    return {
+      id: c.id, server: true, icon: c.product_icon || '💬', title: c.title,
+      who: 'Наразборку · продавец', ref: c.order_ref || 'Чат с продавцом',
+      t: c.last_message_ts || (c.last_message_at ? Date.parse(c.last_message_at) : 0) || Date.now(),
+      unread: Number(c.unread_customer || 0) > 0,
+      important: !!c.important, pinned: !!c.pinned, blocked: !!c.blocked,
+      msgs: (c.messages || []).map(function (m) {
+        return { f: m.sender === 'seller' ? 's' : 'm', t: Date.parse(m.t) || Date.now(), x: m.body, kind: m.kind, rating: m.rating };
+      })
+    };
+  }
+  function pullMessages() {
+    if (!shop()) return Promise.resolve(null);
+    return api('/store/messages?client_id=' + encodeURIComponent(clientId())).then(function (r) {
+      var list = (r.conversations || []).map(mapConv);
+      var A = window.NRAccount;
+      if (A && typeof A.applyServerMessages === 'function') A.applyServerMessages(list);
+      return list;
+    });
+  }
+  window.NRShopMessages = {
+    available: function () { return !!shop(); },
+    signedIn: function () { return !!state.jwt; },
+    clientId: clientId,
+    pull: pullMessages,
+    list: function () { return api('/store/messages?client_id=' + encodeURIComponent(clientId())); },
+    create: function (payload) {
+      return api('/store/messages', { method: 'POST', body: Object.assign({ client_id: clientId() }, payload || {}) });
+    },
+    act: function (id, payload) {
+      return api('/store/messages/' + id, { method: 'POST', body: Object.assign({ client_id: clientId() }, payload || {}) });
+    },
+    thread: function (id) { return api('/store/messages/' + id + '?client_id=' + encodeURIComponent(clientId())); }
+  };
+
+  /* при открытии кабинета подтягиваем свежие заказы и переписку из магазина */
   window.addEventListener('account:open', function () {
-    if (!state.jwt || !shop()) return;
+    if (!shop()) return;
+    pullMessages().catch(function () { /* кабинет останется на прежних данных */ });
+    if (!state.jwt) return;
     pull().catch(function () { /* кабинет останется на прежних данных */ });
   });
 
@@ -5049,6 +5350,11 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
     }, 250);
   }
 
+  /* переписка покупателя: подтягиваем при загрузке страницы */
+  whenShopReady(function () {
+    pullMessages().catch(function () { /* кабинет останется на прежних данных */ });
+  });
+
   /* восстановление сессии после перезагрузки страницы */
   if (state.jwt) {
     whenShopReady(function () {
@@ -5060,6 +5366,203 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
 
   /* сообщаем форме заказа, что оформление идёт через магазин */
   whenShopReady(function () { window.dispatchEvent(new Event('shop:ready')); });
+})();
+</script>
+<div class="sc-bar" id="scBar" hidden>
+  <span aria-hidden="true" id="scBarIcon">💬</span>
+  <b id="scBarTitle">Продавец</b>
+  <span class="sc-badge" id="scBarBadge" hidden>0</span>
+  <button class="sc-btn" type="button" id="scBarUp" aria-label="Развернуть чат с продавцом" title="Развернуть">▲</button>
+  <button class="sc-btn" type="button" id="scBarClose" aria-label="Закрыть чат с продавцом" title="Закрыть">✕</button>
+</div>
+
+<section class="sc-panel" id="scPanel" hidden role="dialog" aria-label="Чат с продавцом">
+  <header class="sc-head">
+    <span class="sc-ic" id="scIcon" aria-hidden="true">💬</span>
+    <span class="sc-t"><b id="scTitle">Продавец</b><small id="scSub">НаРазборку · ответим в течение дня</small></span>
+    <button class="sc-btn" type="button" id="scMin" aria-label="Свернуть чат" title="Свернуть">—</button>
+    <button class="sc-btn" type="button" id="scClose" aria-label="Закрыть чат" title="Закрыть">✕</button>
+  </header>
+  <div class="sc-body" id="scBody" aria-live="polite"></div>
+  <form class="sc-form" id="scForm">
+    <label class="sr" for="scInput">Сообщение продавцу</label>
+    <input id="scInput" type="text" autocomplete="off" maxlength="500" placeholder="Напишите сообщение…">
+    <button type="submit" aria-label="Отправить сообщение">➤</button>
+  </form>
+  <p class="sc-note" id="scNote">Ответ продавца придёт в личный кабинет — раздел «Сообщения».</p>
+</section>
+<script id="sellerChat">
+/* ================= ЧАТ С ПРОДАВЦОМ =================
+   Открывается из карточки товара (кнопка «Написать продавцу»). Окно можно
+   свернуть (—) или закрыть (✕). Сообщения уходят в магазин: их видит продавец
+   в админке, а покупатель — в личном кабинете, в разделе «Сообщения». */
+(function () {
+  var panel = document.getElementById('scPanel'), bar = document.getElementById('scBar');
+  if (!panel || !bar) return;
+  var bodyEl = document.getElementById('scBody'), form = document.getElementById('scForm');
+  var input = document.getElementById('scInput'), note = document.getElementById('scNote');
+  var elTitle = document.getElementById('scTitle'), elIcon = document.getElementById('scIcon');
+  var barTitle = document.getElementById('scBarTitle'), barIcon = document.getElementById('scBarIcon'), barBadge = document.getElementById('scBarBadge');
+  var st = { item: null, convId: '', open: false, min: false, busy: false, unseen: 0, timer: null };
+
+  var NOTE_OK = 'Ответ продавца придёт в личный кабинет — раздел «Сообщения».';
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function shop() { var s = window.NRShop; return (s && s.ok && s.base && s.key) ? s : null; }
+  function api() { return window.NRShopMessages || null; }
+  function ready() { return !!(shop() && api()); }
+  function time(t) { return new Date(t || Date.now()).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }); }
+  function scroll() { bodyEl.scrollTop = bodyEl.scrollHeight; }
+  function noteText(t) { note.textContent = t; }
+  function add(html, cls) {
+    var d = document.createElement('div');
+    d.className = 'sc-msg' + (cls ? ' ' + cls : '');
+    d.innerHTML = html;
+    bodyEl.appendChild(d); scroll();
+    return d;
+  }
+  function clearBody() { bodyEl.innerHTML = ''; }
+  function bubbleHTML(m) {
+    var tag = m.kind === 'review' ? '⭐ Отзыв' + (m.rating ? ' · ' + m.rating + '/5' : '') : m.kind === 'complaint' ? '⚠ Жалоба' : '';
+    var who = m.sender === 'seller' ? 'Продавец' : 'Вы';
+    return '<span class="bub-tag">' + (tag ? tag + ' · ' : '') + who + ' · ' + time(m.t) + '</span>' + esc(m.body);
+  }
+  function paintBadge() {
+    barBadge.hidden = !st.unseen;
+    barBadge.textContent = String(st.unseen);
+  }
+
+  /* ---------- загрузка переписки по этому товару ---------- */
+  function refresh(silent) {
+    if (!ready()) {
+      if (!silent) { clearBody(); add('Магазин недоступен — сообщение не отправится. Попробуйте позже.', 'sys'); }
+      return Promise.resolve();
+    }
+    var item = st.item || {};
+    return api().list().then(function (r) {
+      var list = (r && r.conversations) || [], hit = null;
+      for (var i = 0; i < list.length; i++) {
+        if (String(list[i].product_id) === String(item.id) && !list[i].hidden) { hit = list[i]; break; }
+      }
+      st.convId = hit ? hit.id : '';
+      st.unseen = hit ? Number(hit.unread_customer || 0) : 0;
+      paintBadge();
+      if (st.open) {
+        clearBody();
+        var msgs = (hit && hit.messages) || [];
+        if (!msgs.length) add('Напишите продавцу: наличие, совместимость, доставка — ответим здесь и в личном кабинете.', 'sys');
+        else msgs.forEach(function (m) { add(bubbleHTML(m), m.sender === 'seller' ? '' : 'mine'); });
+        if (st.unseen > 0) markRead();
+      }
+    }).catch(function (e) {
+      if (!silent) { clearBody(); add('Не удалось получить переписку: ' + esc(e && e.message ? e.message : 'нет связи'), 'sys'); }
+    });
+  }
+
+  function markRead() {
+    if (!st.convId || !api()) return;
+    api().act(st.convId, { action: 'read' }).then(function () { st.unseen = 0; paintBadge(); }).catch(function () { });
+  }
+
+  /* ---------- отправка сообщения ---------- */
+  function send(text) {
+    if (!text || st.busy) return;
+    if (!ready()) { noteText('Магазин недоступен — сообщение не отправлено. Попробуйте позже.'); return; }
+    st.busy = true;
+    add(bubbleHTML({ sender: 'customer', body: text, t: Date.now() }), 'mine');
+    if (!st.convId) {
+      api().create({
+        product_id: (st.item && st.item.id) || '',
+        product_title: (st.item && st.item.title) || '',
+        product_icon: (st.item && st.item.icon) || '',
+        subject: (st.item && st.item.title) || 'Вопрос с лендинга',
+        body: text
+      }).then(function (r) {
+        st.busy = false;
+        if (r && r.conversation && r.conversation.id) st.convId = r.conversation.id;
+        noteText('Отправлено. ' + NOTE_OK);
+        return refresh(true);
+      }).catch(fail);
+    } else {
+      api().act(st.convId, { action: 'send', body: text }).then(function () {
+        st.busy = false;
+        noteText('Отправлено. ' + NOTE_OK);
+        return refresh(true);
+      }).catch(fail);
+    }
+    function fail(e) {
+      st.busy = false;
+      noteText('Не отправлено: ' + (e && e.message ? e.message : 'нет связи с магазином'));
+    }
+  }
+
+  /* ---------- окно: открыть, свернуть, закрыть ---------- */
+  function startPoll() {
+    if (st.timer) return;
+    st.timer = setInterval(function () { refresh(true); }, 20000);
+  }
+  function stopPoll() { clearInterval(st.timer); st.timer = null; }
+  function openPanel() {
+    panel.hidden = false; bar.hidden = true;
+    st.open = true; st.min = false;
+    startPoll(); scroll();
+    if (window.innerWidth > 700) input.focus();
+  }
+  function minimize() {
+    if (!st.open) return;
+    panel.hidden = true; bar.hidden = false;
+    st.open = false; st.min = true;
+  }
+  function closePanel() {
+    panel.hidden = true; bar.hidden = true;
+    st.open = false; st.min = false; st.unseen = 0; paintBadge();
+    stopPoll();
+  }
+  function open(item) {
+    st.item = item || st.item;
+    var it = st.item || {};
+    elTitle.textContent = it.title || 'Продавец';
+    elIcon.textContent = it.icon || '💬';
+    barTitle.textContent = it.title || 'Продавец';
+    barIcon.textContent = it.icon || '💬';
+    noteText(NOTE_OK);
+    clearBody();
+    add('Загружаю переписку…', 'sys');
+    openPanel();
+    refresh();
+  }
+
+  document.getElementById('scMin').addEventListener('click', minimize);
+  document.getElementById('scClose').addEventListener('click', closePanel);
+  document.getElementById('scBarUp').addEventListener('click', function () { openPanel(); refresh(); });
+  document.getElementById('scBarClose').addEventListener('click', closePanel);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = input.value.trim();
+    if (!t) return;
+    input.value = '';
+    send(t);
+  });
+
+  /* кнопки «Написать продавцу» в карточке и на странице товара */
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('[data-sell]') : null;
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var id = b.getAttribute('data-id'), it = null, S = window.NRStore;
+    if (S && S.items) {
+      for (var i = 0; i < S.items.length; i++) { if (String(S.items[i].id) === String(id)) { it = S.items[i]; break; } }
+    }
+    if (!it) it = { id: id, title: b.getAttribute('aria-label') || 'Товар', icon: '💬' };
+    open(it);
+  }, true);
+
+  window.NRSellerChat = {
+    open: open,
+    minimize: minimize,
+    close: closePanel,
+    refresh: refresh,
+    state: function () { return { open: st.open, min: st.min, item: st.item && st.item.id, convId: st.convId, unseen: st.unseen }; }
+  };
 })();
 </script>
 </body>
