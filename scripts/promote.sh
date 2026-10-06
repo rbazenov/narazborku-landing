@@ -13,6 +13,7 @@
 # ---------------------------------------------------------------------------
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/_verify.sh
 
 PROD_URL="https://rbazenov.github.io/narazborku-landing/"
 STAGE_URL="https://rbazenov.github.io/narazborku-landing-stage/"
@@ -50,25 +51,9 @@ echo "== 3. переношу в прод =="
 git push -q prod origin/main:main
 echo "   отправлено"
 
-echo "== 4. жду публикацию =="
-for i in $(seq 1 30); do
-  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$PROD_URL?t=$(date +%s)" || echo 000)
-  [ "$CODE" = "200" ] && break
-  sleep 10
-done
-
-echo "== 5. сверяю тест и прод побайтово =="
-curl -s --max-time 60 "$STAGE_URL?t=$(date +%s)" -o /tmp/_stage.html
-curl -s --max-time 60 "$PROD_URL?t=$(date +%s)" -o /tmp/_prod.html
-S=$(md5sum /tmp/_stage.html | cut -d' ' -f1)
-P=$(md5sum /tmp/_prod.html | cut -d' ' -f1)
-if [ "$S" = "$P" ]; then
-  echo "   ✔ адреса идентичны, публикация прошла"
-else
-  echo "   ⚠ страницы ещё различаются (GitHub Pages иногда собирает до 2 минут)."
-  echo "     Проверьте вручную: $PROD_URL"
-fi
-rm -f /tmp/_stage.html /tmp/_prod.html
+echo "== 4. жду публикацию и сверяю содержимое с тестом =="
+mapfile -t CHANGED < <(git diff --name-only prod/main origin/main | grep -v '^$')
+verify_published "$PROD_URL" "${CHANGED[@]}" || true
 
 echo
 echo "ПРОД обновлён:  $PROD_URL"
