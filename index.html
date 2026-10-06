@@ -418,6 +418,7 @@ main { max-width: 1440px; margin: 0 auto; padding: 14px var(--pad) 30px; }
 .cr-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
 .cr-slide .tx, .cr-slide .e { position: relative; z-index: 1; }
 .cr-slide .e { font-size: 68px; line-height: 1; filter: drop-shadow(0 8px 14px rgba(0,0,0,.28)); flex: 0 0 auto; }
+.cr-slide .e-img { position: relative; z-index: 1; flex: 0 0 auto; max-width: 38%; max-height: 128px; border-radius: 12px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0,0,0,.28)); }
 .cr-track { display: flex; transition: transform .45s var(--ease); }
 .cr-track.noanim { transition: none; }
 .cr-slide { position: relative; flex: 0 0 100%; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 24px 56px 30px; min-height: 176px; color: var(--warm); }
@@ -2857,13 +2858,17 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     if (lnk) { const query = lnk.dataset.q || lnk.textContent.trim(); closeCp(); doSearch(query); setMobileTabCurrent(null); }
   });
   /* ============ ЦИКЛИЧНАЯ КАРУСЕЛЬ БАННЕРОВ ============ */
-  const BANNERS = [
+  /* Значения по умолчанию: показываются, если магазин недоступен
+     или в админке список баннеров пуст. */
+  const BANNER_DEFAULTS = [
     { g: 'linear-gradient(105deg, #14161A 0%, #2B2B31 100%)', e: '🛑', t: 'Весенняя распродажа', p: 'Колодки и тормозные диски со скидкой до −25% до конца месяца', c: 'Смотреть акцию', act: { cat: 'Тормозная система' } },
     { g: 'linear-gradient(105deg, #4A4030 0%, #2C281F 100%)', e: '🚚', t: 'Доставка 1–3 дня по России', p: 'Бесплатно при заказе от 3 000 ₽ — привезём до пункта или до двери', c: 'К хитам продаж', act: { scroll: 'hits' } },
     { g: 'linear-gradient(105deg, #5C5344 0%, #3A3428 100%)', e: '🔋', t: 'Трейд-ин аккумуляторов', p: 'Сдайте старую АКБ и получите до 1 000 ₽ скидки на новую', c: 'Выбрать АКБ', act: { q: 'аккумулятор' } },
     { g: 'linear-gradient(105deg, #7A6A4F 0%, #4E4230 100%)', e: '💡', t: 'Новинки: LED-оптика', p: 'Лампы и фары нового поколения — освещение, которое видно', c: 'В раздел освещения', act: { cat: 'Освещение' } },
   ];
-  const crTrack = $('#crTrack'), crDots = $('#crDots'), N = BANNERS.length;
+  let BANNERS = BANNER_DEFAULTS.slice();        // их может заменить админка магазина
+  const crTrack = $('#crTrack'), crDots = $('#crDots');
+  let N = BANNERS.length;
   const banSVG = g => {
     const [c1, c2] = g.match(/#[0-9A-Fa-f]{6}/g) || ['#14161A', '#2B2B31'];
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="307" viewBox="0 0 1450 307"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0.27"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="1450" height="307" fill="url(#g)"/><circle cx="1180" cy="40" r="150" fill="#ffffff" opacity=".06"/><circle cx="1330" cy="270" r="110" fill="#D2B36A" opacity=".14"/><circle cx="240" cy="300" r="130" fill="none" stroke="#D2B36A" stroke-width="26" opacity=".10"/><circle cx="620" cy="-40" r="90" fill="#ffffff" opacity=".05"/></svg>`;
@@ -2872,12 +2877,19 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   const slideHTML = (b, i, clone) => `<div class="cr-slide" style="background:${b.g}" data-i="${i}"${clone ? ' aria-hidden="true"' : ''}>
       <img class="cr-bg" src="${banSVG(b.g)}" width="1450" height="307" alt="" aria-hidden="true">
       <div class="tx"><h3>${b.t}</h3><p>${b.p}</p><button class="cr-cta" data-i="${i}" tabindex="${clone ? -1 : 0}">${b.c}</button></div>
-      <span class="e" aria-hidden="true">${b.e}</span></div>`;
-  crTrack.innerHTML = slideHTML(BANNERS[N - 1], N - 1, true) + BANNERS.map((b, i) => slideHTML(b, i, false)).join('') + slideHTML(BANNERS[0], 0, true);
-  crDots.innerHTML = BANNERS.map((_, i) => `<button class="cr-dot" role="tab" data-i="${i}" aria-label="Слайд ${i + 1}"></button>`).join('');
+      ${b.img ? `<img class="e-img" src="${b.img}" alt="" aria-hidden="true" loading="lazy">` : `<span class="e" aria-hidden="true">${b.e}</span>`}</div>`;
   let crIdx = 0, crTimer = null;
   const crPos = i => crTrack.style.transform = `translateX(-${(i + 1) * 100}%)`;
   const crDotsSync = () => $$('#crDots .cr-dot').forEach((d, i) => d.classList.toggle('on', i === crIdx));
+  /* перерисовка карусели: вызывается при загрузке и после правок в админке */
+  const renderCarousel = (keepIdx) => {
+    N = BANNERS.length;
+    crTrack.innerHTML = slideHTML(BANNERS[N - 1], N - 1, true) + BANNERS.map((b, i) => slideHTML(b, i, false)).join('') + slideHTML(BANNERS[0], 0, true);
+    crDots.innerHTML = BANNERS.map((_, i) => `<button class="cr-dot" role="tab" data-i="${i}" aria-label="Слайд ${i + 1}"></button>`).join('');
+    crIdx = keepIdx ? Math.min(crIdx, N - 1) : 0;
+    crPos(crIdx);
+    crDotsSync();
+  };
   const crGo = (i, anim = true) => {
     crTrack.classList.toggle('noanim', !anim);
     crPos(i);
@@ -2900,11 +2912,58 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   crDots.addEventListener('click', e => { const d = e.target.closest('.cr-dot'); if (d) { crIdx = +d.dataset.i; crGo(crIdx); } });
   crTrack.addEventListener('click', e => {                   // CTA баннера
     const c = e.target.closest('.cr-cta'); if (!c || c.closest('.cr-slide').hasAttribute('aria-hidden')) return;
-    const act = BANNERS[+c.dataset.i].act;
-    if (act.cat) { state.cat = act.cat; state.q = ''; qIn.value = ''; state.page = 1; render(); results.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const act = BANNERS[+c.dataset.i].act || {};
+    if (act.url) window.open(act.url, '_blank', 'noopener');
+    else if (act.cat) { state.cat = act.cat; state.q = ''; qIn.value = ''; state.page = 1; render(); results.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     else if (act.q) doSearch(act.q);
     else if (act.scroll) document.getElementById(act.scroll).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+  /* ---------- баннеры из админки магазина ---------- */
+  const HEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+  const safeText = (v, max) => esc(String(v).replace(/[\r\n\t]+/g, ' ').trim()).slice(0, max);
+  const safeUrl = (v, max) => {                       // ссылки без кавычек и угловых скобок
+    const s = String(v).trim().replace(/["'<>\s]/g, '');
+    return /^(https?:\/\/|\/|data:image\/)/i.test(s) ? s.slice(0, max) : '';
+  };
+  /* «ссылка» кнопки баннера: #якорь | https://адрес | категория:Освещение | поиск:аккумулятор */
+  function parseBannerLink(link, fallback) {
+    if (typeof link !== 'string' || !link.trim()) return fallback;
+    const v = link.trim();
+    if (v.startsWith('#')) return { scroll: safeText(v.slice(1), 40) };
+    if (/^https?:\/\//i.test(v)) return { url: safeUrl(v, 400) };
+    const m = v.match(/^(категория|поиск)\s*:\s*(.+)$/i);
+    if (m) return m[1].toLowerCase() === 'категория' ? { cat: safeText(m[2], 60) } : { q: safeText(m[2], 60) };
+    return { q: safeText(v, 60) };
+  }
+  /* превращает список из админки в слайды; некорректные поля берём из значений по умолчанию */
+  function normalizeBanners(list) {
+    if (!Array.isArray(list) || !list.length) return null;
+    return list.slice(0, 6).map((raw, i) => {
+      const def = BANNER_DEFAULTS[i] || BANNER_DEFAULTS[0];
+      const b = Object.assign({}, def);
+      const r = (raw && typeof raw === 'object') ? raw : {};
+      if (r.title) b.t = safeText(r.title, 90);
+      if (r.text) b.p = safeText(r.text, 180);
+      if (r.button) b.c = safeText(r.button, 40);
+      if (r.icon) b.e = safeText(r.icon, 8);
+      if (r.image) b.img = safeUrl(r.image, 400);
+      if (typeof r.gradient === 'string' && r.gradient.trim()) b.g = r.gradient.trim().slice(0, 200);
+      else if (Array.isArray(r.colors) && r.colors.length >= 2 && HEX.test(String(r.colors[0]).trim()) && HEX.test(String(r.colors[1]).trim()))
+        b.g = `linear-gradient(105deg, ${String(r.colors[0]).trim()} 0%, ${String(r.colors[1]).trim()} 100%)`;
+      b.act = parseBannerLink(r.link, def.act);
+      return b;
+    });
+  }
+  window.NRBanners = {
+    apply(list) {
+      const fixed = normalizeBanners(list);
+      if (!fixed) return false;
+      BANNERS = fixed;
+      renderCarousel(false);
+      return true;
+    },
+    list: () => BANNERS.map(b => ({ title: b.t, text: b.p, button: b.c, link: b.act, icon: b.e, image: b.img || '' }))
+  };
   const crAuto = () => {
     if (crTimer) return;
     if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -2915,7 +2974,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   $('#carousel').addEventListener('pointerleave', crAuto);
   $('#carousel').addEventListener('focusin', crStop);
   $('#carousel').addEventListener('focusout', crAuto);
-  crGo(0, false); crAuto();
+  renderCarousel(false); crAuto();
   // свайп по баннеру
   let swX = null;
   $('#carousel').addEventListener('pointerdown', e => { swX = e.clientX; }, { passive: true });
@@ -4604,6 +4663,16 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
                         total: applied.total, via: res.base,
                         base: res.base, key: SHOP_KEY, region_id: res.region.id,
                         currency_code: res.region.currency_code, variants: variants };
+      /* баннеры и тексты — на служебной странице магазина (адрес landing-content) */
+      getJSON(res.base + '/store/products?handle=landing-content&fields=handle,metadata&limit=1')
+        .then(function (d) {
+          var page = (d.products || [])[0];
+          var meta = (page && page.metadata) || {};
+          window.NRContent = { banners: meta.banners || null, text: meta };
+          if (meta.banners && window.NRBanners && window.NRBanners.apply(meta.banners))
+            console.log('[магазин] баннеры взяты из админки: ' + meta.banners.length);
+        })
+        .catch(function () { window.NRContent = { banners: null, text: {} }; });
       say(applied.updated ? 'цены и наличие из админки' : 'подборка недели',
           'позиций из магазина: ' + applied.updated + ', добавлено новых: ' + applied.added);
       console.log('[магазин] синхронизация через ' + res.base + ': обновлено ' + applied.updated +
