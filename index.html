@@ -1756,7 +1756,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
         <div class="cart-summary-row"><span>Доставка</span><span>рассчитывается отдельно</span></div>
         <div class="cart-summary-row total"><span>Итого без доставки</span><b id="cartTotal">0 ₽</b></div>
         <button type="button" class="cart-checkout" id="checkoutOpen">Перейти к оформлению</button>
-        <p class="cart-summary-note">Корзина сохраняется в этом браузере. Доставка и заказ требуют подключения сервера.</p>
+        <p class="cart-summary-note">Заказ оформляется в нашем магазине: он появится в личном кабинете, а менеджер увидит его в админ-панели.</p>
       </aside>
     </div>
   </section>
@@ -1808,23 +1808,26 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
       <div class="auth-heading">
         <div><span class="auth-eyebrow">ЛИЧНЫЙ КАБИНЕТ</span><h2 id="authTitle">Войти в кабинет</h2><p id="authDescription">Введите телефон или электронную почту, чтобы открыть личный кабинет.</p></div>
       </div>
+      <style>.auth-error{margin:0;color:#9F3326;font-size:12px;line-height:1.45}</style>
       <div class="auth-tabs" role="tablist" aria-label="Вход или регистрация">
         <button type="button" class="auth-tab" id="authTabLogin" role="tab" aria-selected="true" aria-controls="authLoginForm" data-auth-tab="login">Войти</button>
         <button type="button" class="auth-tab" id="authTabRegister" role="tab" aria-selected="false" aria-controls="authRegisterForm" data-auth-tab="register">Регистрация</button>
       </div>
       <form class="auth-form" id="authLoginForm" role="tabpanel" aria-labelledby="authTabLogin">
-        <label class="auth-field" for="authLoginIdentifier">Телефон или электронная почта<input id="authLoginIdentifier" name="identifier" type="text" autocomplete="username" placeholder="+7 999 000-00-00 или name@example.com" required></label>
-        <div class="auth-code-field" id="authLoginCodeField" hidden><label class="auth-field" for="authLoginCode">Код подтверждения<input id="authLoginCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Введите 4 цифры" maxlength="4" pattern="[0-9]{4}" disabled></label><p class="auth-code-note">Демо-код: <b>1234</b>. SMS не отправляется.</p></div>
+        <label class="auth-field" for="authLoginEmail">Электронная почта<input id="authLoginEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></label>
+        <label class="auth-field" for="authLoginPassword">Пароль<input id="authLoginPassword" name="password" type="password" autocomplete="current-password" placeholder="Ваш пароль" minlength="6" required></label>
+        <p class="auth-error" id="authLoginError" hidden></p>
         <button type="submit" class="auth-submit">Войти</button>
-        <p class="auth-note">Демо-макет: SMS не отправляется, кабинет откроется локально.</p>
+        <p class="auth-note">Кабинет связан с магазином: заказы, адреса и статусы доставки — как в админ-панели.</p>
       </form>
       <form class="auth-form" id="authRegisterForm" role="tabpanel" aria-labelledby="authTabRegister" hidden>
         <label class="auth-field" for="authRegisterName">ФИО<input id="authRegisterName" name="name" autocomplete="name" placeholder="Имя и фамилия" required></label>
-        <label class="auth-field" for="authRegisterPhone">Номер телефона<input id="authRegisterPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 999 000-00-00" required></label>
-        <div class="auth-code-field" id="authRegisterCodeField" hidden><label class="auth-field" for="authRegisterCode">Код подтверждения<input id="authRegisterCode" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="Введите 4 цифры" maxlength="4" pattern="[0-9]{4}" disabled></label><p class="auth-code-note">Демо-код: <b>1234</b>. SMS не отправляется.</p></div>
-        <label class="auth-field" for="authRegisterEmail">Электронная почта (необязательно)<input id="authRegisterEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com"></label>
+        <label class="auth-field" for="authRegisterPhone">Номер телефона<input id="authRegisterPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 999 000-00-00"></label>
+        <label class="auth-field" for="authRegisterEmail">Электронная почта<input id="authRegisterEmail" name="email" type="email" autocomplete="email" placeholder="name@example.com" required></label>
+        <label class="auth-field" for="authRegisterPassword">Пароль<input id="authRegisterPassword" name="password" type="password" autocomplete="new-password" placeholder="Минимум 6 символов" minlength="6" required></label>
+        <p class="auth-error" id="authRegisterError" hidden></p>
         <button type="submit" class="auth-submit">Зарегистрироваться</button>
-        <p class="auth-note">Регистрация работает только в рамках демо-макета, без отправки данных на сервер.</p>
+        <p class="auth-note">Аккаунт создаётся в магазине: заказы и адреса сохраняются, их видит менеджер.</p>
       </form>
     </section>
   </div>
@@ -1897,11 +1900,13 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     <h2 id="checkoutTitle">Оформление заказа</h2>
     <p class="checkout-total" id="checkoutTotal">Итого без доставки: 0 ₽</p>
     <form class="checkout-form" id="checkoutForm">
-      <label>Имя<input id="checkoutName" name="name" autocomplete="name" maxlength="80" required></label>
+      <label>Имя и фамилия<input id="checkoutName" name="name" autocomplete="name" maxlength="80" required></label>
       <label>Телефон<input id="checkoutPhone" name="phone" type="tel" autocomplete="tel" required></label>
+      <label>Город<input id="checkoutCity" name="city" autocomplete="address-level2" maxlength="80" placeholder="Москва" required></label>
       <label>Адрес или пункт выдачи<input id="checkoutAddress" name="address" autocomplete="street-address" maxlength="180" required></label>
-      <p class="checkout-note">Это демо-форма: данные не отправляются на сервер, а доставка рассчитывается отдельно.</p>
-      <button type="submit" class="cart-checkout">Подтвердить заказ (демо)</button>
+      <label>Индекс<input id="checkoutZip" name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="101000"></label>
+      <p class="checkout-note" id="checkoutNote">Заказ оформляется в магазине: он появится в разделе «Мои заказы» и у менеджера в админ-панели.</p>
+      <button type="submit" class="cart-checkout" id="checkoutSubmit">Подтвердить заказ</button>
     </form>
   </div>
 </div>
@@ -3362,16 +3367,27 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   $('#checkoutForm').addEventListener('submit', e => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const no = window.NRAccount && window.NRAccount.placeOrder({
+    const data = {
       name: String(fd.get('name') || '').trim(), phone: String(fd.get('phone') || '').trim(),
-      address: String(fd.get('address') || '').trim(), items: [...cart.entries()]
-    });
+      city: String(fd.get('city') || '').trim(), address: String(fd.get('address') || '').trim(),
+      zip: String(fd.get('zip') || '').trim(), items: [...cart.entries()]
+    };
+    /* заказ оформляется в магазине — он попадает в кабинет и в админ-панель */
+    if (window.NRShopAccount && window.NRShopAccount.canOrder()) { window.NRShopAccount.placeOrder(data); return; }
+    if (window.NRShopAccount && window.NRShopAccount.available()) { closeCheckout(); window.NRShopAccount.askLogin(); return; }
+    const no = window.NRAccount && window.NRAccount.placeOrder(data);
     closeCheckout();
     if (!no) { toast('Демо-форма проверена. Заказ не отправлен на сервер.'); return; }
     cart.clear(); persistCart(); renderCart(); e.target.reset();
     toast(window.NRAccount.loggedIn() ? 'Демо-заказ № ' + no + ' оформлен — он в разделе «Мои заказы»' : 'Демо-заказ № ' + no + ' сохранён. Войдите, чтобы увидеть его в кабинете');
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#checkoutModal').hidden) closeCheckout(); });
+  /* подсказка в форме заказа: работает ли оформление через магазин */
+  window.addEventListener('shop:ready', () => {
+    const n = document.getElementById('checkoutNote');
+    if (n && window.NRShopAccount && window.NRShopAccount.available())
+      n.textContent = 'Заказ оформляется у нас в магазине: доставка по России — 450 ₽, оплата при получении. Заказ появится в разделе «Мои заказы».';
+  });
 
   const authModal = $('#authModal'), authLoginForm = $('#authLoginForm'), authRegisterForm = $('#authRegisterForm');
   let authReturnFocus = null, authPreviousOverflow = '';
@@ -3384,7 +3400,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     authLoginForm.hidden = register;
     authRegisterForm.hidden = !register;
     $('#authTitle').textContent = register ? 'Создать аккаунт' : 'Войти в кабинет';
-    $('#authDescription').textContent = register ? 'Заполните данные, чтобы открыть демо-кабинет.' : 'Введите телефон или электронную почту, чтобы открыть личный кабинет.';
+    $('#authDescription').textContent = register ? 'Заполните данные — аккаунт создаётся в магазине.' : 'Введите почту и пароль от аккаунта магазина.';
   }
   function openAuthModal(mode = 'login') {
     if (!$('#catPanel').hidden) closeCp();
@@ -3393,13 +3409,12 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     authReturnFocus = document.activeElement;
     authPreviousOverflow = document.body.style.overflow;
     setAuthTab(mode);
-    syncVerificationField($('#authLoginIdentifier'), $('#authLoginCodeField'), $('#authLoginCode'), true);
-    syncVerificationField($('#authRegisterPhone'), $('#authRegisterCodeField'), $('#authRegisterCode'));
+    errBoxReset();
     authModal.hidden = false;
     document.body.classList.add('auth-modal-open');
     document.body.style.overflow = 'hidden';
     $('#loginBtn').setAttribute('aria-expanded', 'true');
-    requestAnimationFrame(() => (mode === 'register' ? $('#authRegisterName') : $('#authLoginIdentifier')).focus());
+    requestAnimationFrame(() => (mode === 'register' ? $('#authRegisterName') : $('#authLoginEmail')).focus());
   }
   function closeAuthModal(restoreFocus = true) {
     if (authModal.hidden) return;
@@ -3450,7 +3465,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   $('.auth-tabs', authModal).addEventListener('click', event => {
     const tab = event.target.closest('[data-auth-tab]'); if (!tab) return;
     setAuthTab(tab.dataset.authTab);
-    (tab.dataset.authTab === 'register' ? $('#authRegisterName') : $('#authLoginIdentifier')).focus();
+    (tab.dataset.authTab === 'register' ? $('#authRegisterName') : $('#authLoginEmail')).focus();
   });
   $('#authClose').addEventListener('click', () => closeAuthModal());
   authModal.addEventListener('click', event => { if (event.target === authModal) closeAuthModal(); });
@@ -3465,35 +3480,43 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     }
   });
-  $('#authLoginIdentifier').addEventListener('input', event => { event.target.setCustomValidity(''); syncVerificationField(event.target, $('#authLoginCodeField'), $('#authLoginCode'), true); });
+  function errBoxReset() {
+    ['#authLoginError', '#authRegisterError'].forEach(sel => { const b = $(sel); if (b) { b.textContent = ''; b.hidden = true; } });
+  }
+  $('#authLoginEmail').addEventListener('input', event => { event.target.setCustomValidity(''); errBoxReset(); });
+  $('#authLoginPassword').addEventListener('input', event => { event.target.setCustomValidity(''); errBoxReset(); });
   $('#authRegisterName').addEventListener('input', event => event.target.setCustomValidity(''));
-  $('#authRegisterPhone').addEventListener('input', event => { event.target.setCustomValidity(''); syncVerificationField(event.target, $('#authRegisterCodeField'), $('#authRegisterCode')); });
-  $('#authLoginCode').addEventListener('input', event => event.target.setCustomValidity(''));
-  $('#authRegisterCode').addEventListener('input', event => event.target.setCustomValidity(''));
+  $('#authRegisterPhone').addEventListener('input', event => event.target.setCustomValidity(''));
+  $('#authRegisterEmail').addEventListener('input', event => { event.target.setCustomValidity(''); errBoxReset(); });
+  $('#authRegisterPassword').addEventListener('input', event => { event.target.setCustomValidity(''); errBoxReset(); });
   authLoginForm.addEventListener('submit', event => {
     event.preventDefault();
-    const input = $('#authLoginIdentifier'), identifier = input.value.trim();
-    if (!identifier) { input.setCustomValidity('Укажите телефон или электронную почту'); input.reportValidity(); input.focus(); return; }
-    const emailLogin = identifier.includes('@');
-    if (emailLogin) {
-      if (!validAuthEmail(identifier)) { input.setCustomValidity('Введите корректный адрес электронной почты'); input.reportValidity(); input.focus(); return; }
-      input.setCustomValidity('');
-    } else if (!validAuthPhone(input)) return;
-    if (!validAuthCode($('#authLoginCode'))) return;
-    authLoginForm.reset(); syncVerificationField(input, $('#authLoginCodeField'), $('#authLoginCode'), true); closeAuthModal(false);
-    window.dispatchEvent(new CustomEvent('account:open', { detail: emailLogin ? { email: identifier } : { phone: identifier } }));
+    const emailInput = $('#authLoginEmail'), passInput = $('#authLoginPassword');
+    const email = emailInput.value.trim(), password = passInput.value;
+    if (!validAuthEmail(email)) { emailInput.setCustomValidity('Введите корректный адрес электронной почты'); emailInput.reportValidity(); emailInput.focus(); return; }
+    emailInput.setCustomValidity('');
+    if (password.length < 6) { passInput.setCustomValidity('Пароль — не короче 6 символов'); passInput.reportValidity(); passInput.focus(); return; }
+    passInput.setCustomValidity('');
+    /* вход выполняет связка с магазином: она же откроет кабинет с заказами покупателя */
+    if (window.NRShopAccount && window.NRShopAccount.available()) { window.NRShopAccount.signIn(email, password); return; }
+    authLoginForm.reset(); closeAuthModal(false);
+    window.dispatchEvent(new CustomEvent('account:open', { detail: { email: email } }));
   });
   authRegisterForm.addEventListener('submit', event => {
     event.preventDefault();
     const nameInput = $('#authRegisterName'), phoneInput = $('#authRegisterPhone');
-    const name = nameInput.value.trim(), phone = phoneInput.value.trim(), email = $('#authRegisterEmail').value.trim();
+    const emailInput = $('#authRegisterEmail'), passInput = $('#authRegisterPassword');
+    const name = nameInput.value.trim(), phone = phoneInput.value.trim();
+    const email = emailInput.value.trim(), password = passInput.value;
     if (!name) { nameInput.setCustomValidity('Укажите ФИО'); nameInput.reportValidity(); nameInput.focus(); return; }
     nameInput.setCustomValidity('');
-    if (!phone) { phoneInput.setCustomValidity('Укажите номер телефона'); phoneInput.reportValidity(); phoneInput.focus(); return; }
-    if (!validAuthPhone(phoneInput)) return;
-    if (!validAuthCode($('#authRegisterCode'))) return;
-    if (email && !$('#authRegisterEmail').checkValidity()) { $('#authRegisterEmail').reportValidity(); return; }
-    authRegisterForm.reset(); syncVerificationField(phoneInput, $('#authRegisterCodeField'), $('#authRegisterCode')); closeAuthModal(false);
+    if (phone && !validAuthPhone(phoneInput)) return;
+    if (!validAuthEmail(email)) { emailInput.setCustomValidity('Введите корректный адрес электронной почты'); emailInput.reportValidity(); emailInput.focus(); return; }
+    emailInput.setCustomValidity('');
+    if (password.length < 6) { passInput.setCustomValidity('Пароль — не короче 6 символов'); passInput.reportValidity(); passInput.focus(); return; }
+    passInput.setCustomValidity('');
+    if (window.NRShopAccount && window.NRShopAccount.available()) { window.NRShopAccount.signUp({ name: name, phone: phone, email: email, password: password }); return; }
+    authRegisterForm.reset(); closeAuthModal(false);
     window.dispatchEvent(new CustomEvent('account:open', { detail: { name, phone, email } }));
   });
   $('#loginBtn').addEventListener('click', () => {
@@ -4002,7 +4025,9 @@ function vProfile() {
   var notif = '<section class="panel"><div class="panel-h"><h2>Уведомления</h2></div>' +
     sw('status', 'Статусы заказов', 'SMS и письмо, когда заказ собран, передан в доставку и доставлен') + sw('replies', 'Ответы продавцов', 'Уведомление о новом сообщении в диалоге') +
     sw('price', 'Снижение цены в избранном', 'Сообщим, если товар из избранного подешевел или появился в наличии') + sw('promo', 'Акции и подборки', 'Не чаще двух писем в месяц') + '</section>';
-  var more = '<section class="panel"><div class="panel-h"><h2>Демо-режим и выход</h2></div><p class="note" style="margin:0 0 12px">Заказы, гараж, адреса и сообщения в этом макете хранятся только в вашем браузере и не отправляются на сервер.</p><div class="actions" style="margin-top:0"><button class="btn btn-soft sm" type="button" data-act="reset-demo">' + ic('repeat') + 'Сбросить демо-данные</button><button class="btn btn-danger sm" type="button" data-act="logout">Выйти из кабинета</button></div></section>';
+  var more = '<section class="panel"><div class="panel-h"><h2>' + (S.server ? 'Выход' : 'Демо-режим и выход') + '</h2></div><p class="note" style="margin:0 0 12px">' + (S.server
+    ? 'Заказы и данные профиля хранятся в вашем аккаунте магазина — их видит менеджер в админ-панели.'
+    : 'Заказы, гараж, адреса и сообщения в этом макете хранятся только в вашем браузере и не отправляются на сервер.') + '</p><div class="actions" style="margin-top:0"><button class="btn btn-soft sm" type="button" data-act="reset-demo">' + ic('repeat') + 'Сбросить демо-данные</button><button class="btn btn-danger sm" type="button" data-act="logout">Выйти из кабинета</button></div></section>';
   return heading('Профиль и настройки', 'Контактные данные и уведомления.') + data + notif + more;
 }
 
@@ -4236,7 +4261,10 @@ function closeAccount(restoreScroll) {
   }
 }
 function leave(fn) { closeAccount(false); fn(); }
-function doLogout() { setAuth(false); closeAccount(); toast('Вы вышли из личного кабинета'); }
+function doLogout() {
+  if (window.NRShopAccount && window.NRShopAccount.signOutLocal) window.NRShopAccount.signOutLocal();
+  setAuth(false); closeAccount(); toast('Вы вышли из личного кабинета');
+}
 
 ACT['go-home'] = function () { leave(function () { NR.goHome(); }); };
 ACT['go-catalog'] = function () {
@@ -4313,7 +4341,53 @@ window.NRAccount = {
       pay: 'Оплата при получении (демо)', conv: '' };
     S.orders.unshift(o); save();
     return o.no;
+  },
+
+  /* ---------- данные настоящего магазина (shop.finklass.online) ----------
+     Кабинет показывает заказы покупателя из магазина. Если магазин недоступен,
+     остаётся демо-макет. */
+  applyServer: function (data) {
+    data = data || {};
+    var p = data.profile;
+    if (p) {
+      if (p.name) S.profile.name = p.name;
+      if (p.email) S.profile.email = p.email;
+      if (p.phone) S.profile.phone = p.phone;
+    }
+    if (data.orders) S.orders = data.orders;
+    if (data.auth) { S.server = true; setAuth(true); }   // покупатель авторизован в магазине
+    save();
+    if (!acc.hidden) render();
+  },
+  resetServer: function () {
+    S.server = false;
+    S.orders = [];
+    S.profile = { name: '', phone: '', email: '', avatar: S.profile.avatar };
+    save();
+    if (!acc.hidden) render();
+  },
+  serverMode: function () { return !!S.server; },
+  cabinetOpen: function () { return !acc.hidden; },
+  openCabinet: function (section) {
+    var want = '#cabinet' + (section ? '/' + section : '');
+    if (location.hash === want) { if (acc.hidden) openAccount(null, true); else render(); }
+    else location.hash = want;
   }
+};
+
+/* ---------- покупки в магазине ---------- */
+/* Заказы, оформленные через магазин, отменяет менеджер: локальная отмена
+   в кабинете на них не действует. */
+var cancelOrderLocal = ACT['cancel-order'];
+ACT['cancel-order'] = function (id, b) {
+  var o = findBy(S.orders, 'no', id);
+  if (o && o.server) {
+    confirmBox('Отменить заказ № ' + id + '?',
+      'Заказ оформлен в магазине — отмену подтверждает менеджер. Напишите нам или позвоните, оплата вернётся на карту в течение 1–3 рабочих дней.',
+      'Понятно', function () { });
+    return;
+  }
+  cancelOrderLocal(id, b);
 };
 
 /* ---------- старт ---------- */
@@ -4503,10 +4577,10 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
       if (!region) throw new Error('регион не найден');
       return getJSON(hit.base + '/store/products?limit=100&region_id=' + region.id +
                      '&fields=+variants.inventory_quantity,*categories,+collection')
-        .then(function (data) { return { base: hit.base, data: data }; });
+        .then(function (data) { return { base: hit.base, data: data, region: region }; });
     })
     .then(function (res) {
-      var records = [];
+      var records = [], variants = {};
       (res.data.products || []).forEach(function (p) {
         var inShowcase = !!(p.collection && p.collection.title === SHOWCASE);
         var cat = (p.categories || []).map(function (c) { return SYN[c.name] || c.name; })[0] || '';
@@ -4515,17 +4589,21 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
           var cp = v.calculated_price || {};
           var stock = (typeof v.inventory_quantity === 'number')
             ? v.inventory_quantity : (v.manage_inventory === false ? 99 : 0);
+          /* магазин хранит цены в копейках: 39000 в ответе — это 390 ₽ на витрине */
+          var price = (typeof cp.calculated_amount === 'number') ? cp.calculated_amount / 100 : 0;
+          var old   = (typeof cp.original_amount === 'number')    ? cp.original_amount / 100    : 0;
+          if (v.sku) variants[String(v.sku)] = v.id;      // нужно для оформления заказа
           records.push({
             sku: v.sku, title: p.title, brand: brand, cat: cat,
-            price: (typeof cp.calculated_amount === 'number') ? cp.calculated_amount : 0,
-            old:   (typeof cp.original_amount === 'number') ? cp.original_amount : 0,
-            stock: stock, add: inShowcase
+            price: price, old: old, stock: stock, add: inShowcase
           });
         });
       });
       var applied = bridge.applyShop(records);
       window.NRShop = { ok: true, updated: applied.updated, added: applied.added,
-                        total: applied.total, via: res.base };
+                        total: applied.total, via: res.base,
+                        base: res.base, key: SHOP_KEY, region_id: res.region.id,
+                        currency_code: res.region.currency_code, variants: variants };
       say(applied.updated ? 'цены и наличие из админки' : 'подборка недели',
           'позиций из магазина: ' + applied.updated + ', добавлено новых: ' + applied.added);
       console.log('[магазин] синхронизация через ' + res.base + ': обновлено ' + applied.updated +
@@ -4536,6 +4614,348 @@ if (/^#cabinet(\/|$)/.test(location.hash)) {
       say('подборка недели', 'Магазин недоступен — показаны встроенные данные');
       console.log('[магазин] данные не получены, показан демо-каталог:', String(err));
     });
+})();
+</script>
+<script id="shopAccount">
+/* ================= ЛИЧНЫЙ КАБИНЕТ ЧЕРЕЗ МАГАЗИН =================
+   Вход, регистрация, список заказов и оформление заказа работают с настоящим
+   магазином (shop.finklass.online, Medusa v2): заказ виден покупателю в кабинете
+   и менеджеру в админ-панели. Если магазин недоступен, страница остаётся
+   демо-макетом, как раньше. */
+(function () {
+  var SKEY = 'nr.shop.session';
+  var state = { jwt: '', email: '' };
+  try {
+    var raw = JSON.parse(localStorage.getItem(SKEY) || '{}');
+    state.jwt = raw.jwt || ''; state.email = raw.email || '';
+  } catch (e) { /* нет сохранённой сессии */ }
+
+  function save() { try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch (e) { } }
+  function shop() {
+    var s = window.NRShop;
+    return (s && s.ok && s.base && s.key && s.region_id && s.variants) ? s : null;
+  }
+  function el(id) { return document.getElementById(id); }
+  function money(n) { return Number(n).toLocaleString('ru-RU') + '\u00A0₽'; }
+  function art(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+  function closeModal(btnId) { var b = el(btnId); if (b) b.click(); }
+  function errBox(id, text) { var p = el(id); if (!p) return; p.textContent = text || ''; p.hidden = !text; }
+  function hint(text) { var p = el('checkoutNote'); if (p) p.textContent = text; }
+  var toastTimer = null;
+  function toast(text) {
+    if (typeof window.toast === 'function' && window.toast !== toast) { window.toast(text); return; }
+    var t = el('toast'); if (!t) return;
+    t.innerHTML = text; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 3800);
+  }
+
+  function api(path, opts) {
+    var s = shop();
+    if (!s) return Promise.reject(new Error('магазин недоступен'));
+    opts = opts || {};
+    var headers = { 'x-publishable-api-key': s.key, 'Content-Type': 'application/json' };
+    if (opts.auth !== false && state.jwt) headers.Authorization = 'Bearer ' + state.jwt;
+    var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, opts.timeout || 25000) : null;
+    return fetch(s.base + path, {
+      method: opts.method || 'GET', headers: headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      signal: ctl ? ctl.signal : undefined
+    }).then(function (res) {
+      if (timer) clearTimeout(timer);
+      return res.text().then(function (text) {
+        var data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = null; }
+        if (!res.ok) {
+          var err = new Error((data && data.message) || ('магазин ответил ошибкой ' + res.status));
+          err.status = res.status;
+          throw err;
+        }
+        return data || {};
+      });
+    });
+  }
+
+  /* ---------- позиции заказа: артикул лендинга ↔ вариант магазина ---------- */
+  function itemIdBySku(sku, title, price) {
+    var NR = window.NRStore; if (!NR) return null;
+    var key = art(sku);
+    var hit = NR.items.filter(function (it) { return art(it.art) === key; })[0];
+    if (hit) return hit.id;
+    if (!key || !title) return null;
+    if (typeof NR.applyShop === 'function') {           // позиция есть в магазине, но нет на витрине
+      NR.applyShop([{ sku: String(sku), title: String(title), brand: 'Магазин', cat: '',
+                      price: Math.max(0, Number(price) || 0), old: 0, stock: 1, add: true }]);
+      hit = NR.items.filter(function (it) { return it.id === 'shop-' + String(sku).replace(/[^A-Za-z0-9_-]/g, ''); })[0];
+      if (hit) return hit.id;
+    }
+    return null;
+  }
+  function mapStatus(o) {
+    if (o.status === 'canceled') return 'cancelled';
+    var f = String(o.fulfillment_status || '');
+    if (f === 'shipped' || f === 'partially_shipped') return 'shipped';
+    if (f === 'fulfilled' || f === 'delivered') return 'delivered';
+    return 'processing';
+  }
+  function payText(p) {
+    if (p === 'captured') return 'Оплачен';
+    if (p === 'refunded') return 'Возврат средств выполнен';
+    if (p === 'canceled') return 'Платёж отменён';
+    if (p === 'authorized') return 'Оплата подтверждена';
+    return 'Оплата при получении';
+  }
+  function addrText(a) { return a ? [a.postal_code, a.city, a.address_1].filter(Boolean).join(', ') : ''; }
+  function mapOrder(o) {
+    var lines = (o.items || []).map(function (it) {
+      var id = itemIdBySku(it.variant_sku || it.subtitle, it.product_title || it.title, (it.unit_price || 0) / 100);
+      return id ? { id: id, q: it.quantity, price: (it.unit_price || 0) / 100 } : null;
+    }).filter(Boolean);
+    var sm = (o.shipping_methods || [])[0] || {};
+    var created = Date.parse(o.created_at) || Date.now();
+    return {
+      no: String(o.display_id), server: true, status: mapStatus(o), created: created,
+      lines: lines, delivery: (sm.amount || 0) / 100,
+      method: sm.name || 'Способ доставки уточнит менеджер',
+      track: '', eta: created + 3 * 86400000, addr: '', addrText: addrText(o.shipping_address),
+      pay: payText(o.payment_status), conv: ''
+    };
+  }
+
+  var ORDER_FIELDS = 'id,display_id,status,payment_status,fulfillment_status,created_at,total,' +
+                     'currency_code,*items,shipping_methods.*,shipping_address.*';
+
+  function pull(from) {
+    if (!state.jwt) return Promise.resolve(null);
+    return Promise.all([
+      api('/store/customers/me').then(function (r) { return r.customer || {}; }).catch(function () { return {}; }),
+      api('/store/orders?limit=50&order=-created_at&fields=' + ORDER_FIELDS)
+        .then(function (r) { return (r.orders || []).map(mapOrder); })
+    ]).then(function (res) {
+      var c = res[0] || {}, orders = res[1] || [];
+      var name = [c.first_name, c.last_name].filter(Boolean).join(' ') || c.email || state.email;
+      var A = window.NRAccount;
+      if (A && typeof A.applyServer === 'function') {
+        A.applyServer({ auth: true, orders: orders, profile: { name: name, email: c.email || state.email, phone: c.phone || '' } });
+      }
+      return { orders: orders, customer: c };
+    });
+  }
+
+  function signIn(email, password) {
+    if (!email || !password) return;
+    errBox('authLoginError', '');
+    return api('/auth/customer/emailpass', { method: 'POST', auth: false, body: { email: email, password: password } })
+      .then(function (r) {
+        if (!r.token) throw new Error('магазин не подтвердил вход');
+        state.jwt = r.token; state.email = email; save();
+        return pull();
+      })
+      .then(function () {
+        closeModal('authClose');
+        if (window.NRAccount && window.NRAccount.openCabinet) window.NRAccount.openCabinet('');
+        toast('Вы вошли как ' + email + ' — заказы подгружены из магазина');
+      })
+      .catch(function (err) {
+        state.jwt = ''; save();
+        errBox('authLoginError', err && err.status === 401
+          ? 'Неверная почта или пароль. Если аккаунта ещё нет — перейдите на «Регистрация».'
+          : 'Не удалось войти: ' + (err && err.message ? err.message : 'магазин недоступен'));
+      });
+  }
+
+  function signUp(data) {
+    errBox('authRegisterError', '');
+    var parts = String(data.name || '').trim().split(/\s+/);
+    var first = parts[0] || '', last = parts.slice(1).join(' ');
+    return api('/auth/customer/emailpass/register', {
+      method: 'POST', auth: false, body: { email: data.email, password: data.password }
+    })
+      .then(function (r) {
+        if (!r.token) throw new Error('магазин не подтвердил регистрацию');
+        state.jwt = r.token; state.email = data.email; save();
+        return api('/store/customers', {
+          method: 'POST', body: { email: data.email, first_name: first, last_name: last, phone: data.phone || undefined }
+        });
+      })
+      /* свежий вход: токен регистрации ещё не связан с покупателем, заказы по нему недоступны */
+      .then(function () {
+        return api('/auth/customer/emailpass', { method: 'POST', auth: false, body: { email: data.email, password: data.password } })
+          .then(function (r2) { if (r2.token) { state.jwt = r2.token; save(); } });
+      })
+      .then(function () { return pull(); })
+      .then(function () {
+        closeModal('authClose');
+        if (window.NRAccount && window.NRAccount.openCabinet) window.NRAccount.openCabinet('');
+        toast('Аккаунт создан: ' + data.email + '. Он же — аккаунт покупателя в магазине');
+      })
+      .catch(function (err) {
+        var m = err && err.message ? err.message : 'магазин недоступен';
+        if (err && err.status === 401 && /already|exist/i.test(m)) m = 'Такая почта уже зарегистрирована — войдите с паролем.';
+        errBox('authRegisterError', 'Не удалось создать аккаунт: ' + m);
+      });
+  }
+
+  function askLogin() {
+    var btn = el('loginBtn');
+    if (btn) btn.click();
+    setTimeout(function () {
+      var d = el('authDescription');
+      if (d) d.textContent = 'Чтобы оформить заказ, войдите или зарегистрируйтесь: заказ появится в личном кабинете.';
+    }, 40);
+  }
+
+  /* ---------- оформление заказа целиком через магазин ---------- */
+  function linesFromCart(items) {
+    var s = shop(), out = [], missing = [];
+    (items || []).forEach(function (pair) {
+      var it = window.NRStore && window.NRStore.item(pair[0]);
+      var sku = it && it.art ? String(it.art) : '';
+      var vid = sku && s.variants[sku] ? s.variants[sku] : null;
+      if (!vid && sku) {
+        var key = art(sku);
+        var found = Object.keys(s.variants).filter(function (k) { return art(k) === key; })[0];
+        vid = found ? s.variants[found] : null;
+      }
+      if (vid) out.push({ variant_id: vid, q: pair[1], title: it.title });
+      else missing.push(it ? it.title : pair[0]);
+    });
+    return { lines: out, missing: missing };
+  }
+  /* понятные причины отказа магазина вместо технических сообщений */
+  function friendlyError(err) {
+    var m = (err && err.message) ? String(err.message) : 'магазин недоступен';
+    if (/inventory|stock|остат/i.test(m)) return 'товар закончился на складе — уменьшите количество или выберите аналог';
+    if (/shipping|delivery|zone/i.test(m)) return 'для этого адреса нет доступной доставки — проверьте город и адрес';
+    if (/region|currency/i.test(m)) return 'магазин не обслуживает этот регион';
+    if (/not authenticated|unauthor/i.test(m)) return 'сессия истекла — войдите заново';
+    return m;
+  }
+  function address(d) {
+    var parts = String(d.name || '').trim().split(/\s+/);
+    return {
+      first_name: parts[0] || 'Покупатель', last_name: parts.slice(1).join(' ') || '',
+      address_1: d.address || '', city: d.city || '', postal_code: d.zip || '',
+      country_code: 'ru', phone: d.phone || ''
+    };
+  }
+  function clearLandingCart() {
+    var NR = window.NRStore; if (!NR || !NR.cart) return;
+    NR.items.forEach(function (it) { var q = NR.cart.qty(it.id); if (q > 0) NR.cart.change(it.id, -q); });
+  }
+
+  function placeOrder(data) {
+    var s = shop();
+    if (!s) { toast('Магазин недоступен — оформите заказ по телефону'); return; }
+    if (!state.jwt) { askLogin(); return; }
+    var resolved = linesFromCart(data.items);
+    if (!resolved.lines.length) {
+      hint('Эти позиции оформляются по телефону: онлайн-заказ собирается из товаров магазина.');
+      toast('В корзине нет товаров, доступных для онлайн-оформления');
+      return;
+    }
+    var btn = el('checkoutSubmit'), label = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Оформляем заказ…'; }
+    hint('Оформляем заказ в магазине…');
+    var cartId = '';
+    return api('/store/carts', { method: 'POST', body: { region_id: s.region_id, email: state.email } })
+      .then(function (r) {
+        cartId = r.cart.id;
+        return resolved.lines.reduce(function (p, l) {
+          return p.then(function () {
+            return api('/store/carts/' + cartId + '/line-items', { method: 'POST', body: { variant_id: l.variant_id, quantity: l.q } });
+          });
+        }, Promise.resolve());
+      })
+      .then(function () {
+        var a = address(data);
+        return api('/store/carts/' + cartId, { method: 'POST', body: { email: state.email, shipping_address: a, billing_address: a } });
+      })
+      .then(function () {
+        return api('/store/shipping-options?cart_id=' + cartId).then(function (r) {
+          var list = r.shipping_options || [];
+          if (!list.length) throw new Error('для этого адреса нет доступной доставки');
+          return list.filter(function (o) { return (o.amount || 0) >= 0; })[0];
+        });
+      })
+      .then(function (opt) {
+        return api('/store/carts/' + cartId + '/shipping-methods', { method: 'POST', body: { option_id: opt.id } })
+          .then(function () { return opt; });
+      })
+      .then(function (opt) {
+        hint('Доставка: ' + (opt.name || 'по России') + ' — ' + money((opt.amount || 0) / 100) + '. Подтверждаем заказ…');
+        return api('/store/payment-providers?region_id=' + s.region_id).then(function (r) {
+          var list = r.payment_providers || [];
+          var p = list.filter(function (x) { return x.id === 'pp_system_default'; })[0] || list[0];
+          if (!p) throw new Error('в магазине не подключён способ оплаты');
+          return api('/store/payment-collections', { method: 'POST', body: { cart_id: cartId } })
+            .then(function (pc) { return api('/store/payment-collections/' + pc.payment_collection.id + '/payment-sessions', { method: 'POST', body: { provider_id: p.id } }); })
+            .then(function () { return api('/store/carts/' + cartId + '/complete', { method: 'POST', timeout: 60000 }); });
+        });
+      })
+      .then(function (r) {
+        var o = (r && r.order) ? r.order : null;
+        if (!o) throw new Error('магазин не подтвердил заказ');
+        clearLandingCart();
+        closeModal('checkoutClose');
+        toast('Заказ №' + o.display_id + ' на ' + money((o.total || 0) / 100) + ' оформлен — он в разделе «Мои заказы»'
+              + (resolved.missing.length ? '. Часть позиций оформляется по телефону' : ''));
+        return pull().then(function () {
+          if (window.NRAccount && window.NRAccount.openCabinet) window.NRAccount.openCabinet('orders');
+        });
+      })
+      .catch(function (err) {
+        hint('Заказ не оформлен: ' + friendlyError(err));
+        toast('Не удалось оформить заказ — попробуйте ещё раз');
+        if (err && err.status === 401) { state.jwt = ''; save(); askLogin(); }
+      })
+      .then(function () { if (btn) { btn.disabled = false; btn.textContent = label || 'Подтвердить заказ'; } });
+  }
+
+  /* ---------- связь с кабинетом лендинга ---------- */
+  window.NRShopAccount = {
+    available: function () { return !!shop(); },
+    canOrder: function () { return !!shop() && !!state.jwt; },
+    signedIn: function () { return !!state.jwt; },
+    email: function () { return state.email; },
+    signIn: signIn,
+    signUp: signUp,
+    askLogin: askLogin,
+    placeOrder: placeOrder,
+    refresh: function () { return pull(); },
+    signOutLocal: function () {
+      state.jwt = ''; state.email = ''; save();
+      if (window.NRAccount && window.NRAccount.resetServer) window.NRAccount.resetServer();
+    }
+  };
+
+  /* при открытии кабинета подтягиваем свежие заказы из магазина */
+  window.addEventListener('account:open', function () {
+    if (!state.jwt || !shop()) return;
+    pull().catch(function () { /* кабинет останется на прежних данных */ });
+  });
+
+  /* пока витрина не получила адрес магазина, запросы отправлять некуда */
+  function whenShopReady(cb) {
+    if (shop()) { cb(); return; }
+    var tries = 0;
+    var timer = setInterval(function () {
+      if (shop()) { clearInterval(timer); cb(); }
+      else if (++tries > 80) clearInterval(timer);
+    }, 250);
+  }
+
+  /* восстановление сессии после перезагрузки страницы */
+  if (state.jwt) {
+    whenShopReady(function () {
+      pull().catch(function (err) {
+        if (err && err.status === 401) { state.jwt = ''; save(); }   // сессия истекла
+      });
+    });
+  }
+
+  /* сообщаем форме заказа, что оформление идёт через магазин */
+  whenShopReady(function () { window.dispatchEvent(new Event('shop:ready')); });
 })();
 </script>
 </body>
