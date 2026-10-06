@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rbazenov.github.io/narazborku-landing/sitemap.xml
+Sitemap: https://finklass.online/sitemap.xml
