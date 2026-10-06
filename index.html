@@ -1594,7 +1594,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
     </div>
     <div class="sect-h"><h2>Популярные запросы</h2><span class="ln">более 500 000 позиций</span></div>
     <div class="pop-chips" id="popChips"></div>
-    <div class="sect-h"><h2>Хиты продаж</h2><span class="ln" id="hitsLine">демо-каталог</span></div>
+    <div class="sect-h"><h2>Хиты продаж</h2><span class="ln" id="hitsLine">подборка недели</span></div>
     <div class="grid" id="hits"></div>
   </section>
 
@@ -3565,6 +3565,7 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
           if (r.cat && CAT_ICON[r.cat]) it.cat = r.cat;
           if (typeof r.stock === 'number') it.stock = Math.max(0, r.stock);
           it.live = true;
+          if (r.add) it.showcase = true;
           it.nq = norm(it.title); it.bq = norm(it.brand); it.cq = norm(it.cat); it.aq = keyOf(it.art);
           updated++;
           return;
@@ -3577,12 +3578,22 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
             price: r.price, old: (r.old > r.price ? r.old : 0),
             stock: (typeof r.stock === 'number' ? r.stock : 0), rate: 5, rev: 0,
             icon: CAT_ICON[cat], nq: norm(r.title || ''), bq: norm(r.brand || ''),
-            cq: norm(cat), aq: k, pop: 0, live: true
+            cq: norm(cat), aq: k, pop: 0, live: true, showcase: !!r.add
           };
           ITEMS.push(it); index.set(k, it); added++;
         }
       });
-      if (updated || added) { try { render(); } catch (err) { /* экран перерисуется сам */ } }
+      if (updated || added) {
+        try {
+          const strip = document.getElementById('hits');
+          if (strip) {
+            strip.innerHTML = ITEMS.slice().sort((a, b) =>
+              (b.showcase ? 1 : 0) - (a.showcase ? 1 : 0) || b.pop - a.pop
+            ).slice(0, 10).map(i => cardHTML(i, '', true)).join('');
+          }
+          render();
+        } catch (err) { /* страница остаётся на прежних данных */ }
+      }
       return { updated: updated, added: added, total: ITEMS.length };
     },
     fav: {
