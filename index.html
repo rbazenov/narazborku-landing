@@ -2921,8 +2921,18 @@ main > #info.route-enter { animation: nr-screen-enter 230ms var(--ease); }
   /* ---------- баннеры из админки магазина ---------- */
   const HEX = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
   const safeText = (v, max) => esc(String(v).replace(/[\r\n\t]+/g, ' ').trim()).slice(0, max);
+  /* Картинки, загруженные в админке, лежат на сайте магазина: админка может выдать
+     ссылку с внутренним адресом (localhost:9000) — заменяем её на адрес магазина.
+     Короткий путь вида /static/… тоже достраиваем до полного адреса. */
+  const shopBaseUrl = (window.NRShop && window.NRShop.base) || 'https://shop.finklass.online';
+  const fixImg = (u) => {
+    let s = String(u || '').trim();
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i.test(s)) s = s.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//i, shopBaseUrl + '/');
+    else if (/^\/static\//i.test(s)) s = shopBaseUrl + s;
+    return s;
+  };
   const safeUrl = (v, max) => {                       // ссылки без кавычек и угловых скобок
-    const t = String(v).trim().replace(/["'<>\s]/g, '');
+    const t = fixImg(v).replace(/["'<>\s]/g, '');
     return /^(https?:\/\/|\/|data:image\/)/i.test(t) ? t.slice(0, max) : '';
   };
   /* «ссылка» кнопки баннера: #якорь | https://адрес | категория:Освещение | поиск:аккумулятор */
